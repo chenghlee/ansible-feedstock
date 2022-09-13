@@ -1,7 +1,6 @@
 {% set name = "ansible" %}
 {% set version = "6.3.0" %}
 
-
 package:
   name: {{ name|lower }}
   version: {{ version }}
@@ -24,20 +23,20 @@ requirements:
     - setuptools
   run:
     - python
-    - setuptools
-    - ansible-core
-    - paramiko
+    - ansible-core >=2.13.3,<2.14.0a0
+
+    # Only require dependencies for a core set of modules (mostly filters from
+    # the `ansible.utils` and `community.general` collections).  Dependencies
+    # needed for modules in other collections to properly function will be
+    # handled by separate `ansible-*` meta-packages.
     - jinja2
+    - jmespath
+    - netaddr
     - pyyaml
-    - httplib2
-    - cryptography
-    - six
-    - openstacksdk
-    - boto
 
 test:
   commands:
-    - ansible --version
+    - ansible-community --version
   imports:
     - ansible
     - ansible.constants
@@ -45,20 +44,24 @@ test:
     - ansible.utils
 
 about:
-  home: http://github.com/ansible/ansible
-  license: GPL-3.0-only
+  home: https://ansible.com/
+  license: GPL-3.0-or-later
   license_file: COPYING
   summary: Ansible is a radically simple IT automation platform
+  description: >
+    Ansible is a radically simple IT automation system. It makes applications
+    and systems easier to deploy by handling configuration management,
+    application deployment, cloud provisioning, ad-hoc task execution, network
+    automation, and multi-node orchestration.
 
-  description: |
-    Ansible is a radically simple IT automation platform
-    that makes your applications and systems easier to deploy.
-    Includes support for OpenStack (shade) and EC2 (AWS), extra
-    batteries included.
-  doc_url: https://www.ansible.com/
+    This package includes all collections from the (upstream) Ansible community
+    package.  It also installs dependencies for a core set of modules, mostly
+    filters from the `ansible.utils` and `community.general` collections.
+  doc_url: https://docs.ansible.com/ansible/latest/index.html
   dev_url: https://github.com/ansible/ansible
 
 extra:
   recipe-maintainers:
     - brainstorm
     - tschoonj
+    - chenghlee
