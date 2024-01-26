@@ -1,6 +1,7 @@
 {% set name = "ansible" %}
-{% set version = "8.5.0" %}
+{% set version = "9.1.0" %}
 
+{% set python_min = "3.10" %}
 
 package:
   name: {{ name|lower }}
@@ -8,48 +9,55 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 327c509bdaf5cdb2489d85c09d2c107e9432f9874c8bb5c0702a731160915f2d
+  sha256: 5ad94991fb0e0e53a770a9ffcf1b68047f61b2282d948a7d2682ecd8fb8fa1bf
 
 build:
+  number: 0
   entry_points:
     - ansible-community=ansible_collections.ansible_community:main
   noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
-  number: 0
 
 requirements:
   host:
     - pip
-    - python >=3.9
+    - python {{ python_min }}
     - setuptools
   run:
-    - python >=3.9
-    - ansible-core >=2.15.2,<2.16
+    - python >={{ python_min }}
+    - ansible-core >=2.16.1,<2.17.0a0
     # https://docs.ansible.com/ansible/latest/user_guide/windows_faq.html#can-ansible-run-on-windows
     - __unix
 
+    # Only require dependencies for a core set of modules (mostly filters from
+    # the `ansible.utils` and `community.general` collections).  Dependencies
+    # needed for modules in other collections to properly function will be
+    # handled by separate `ansible-*` meta-packages.
+    - jinja2
+    - jmespath
+    - netaddr
+    - pyyaml
+
 test:
-  requires:
-    - pip
   commands:
-    - ansible --version
-    - pip check
-    - ansible-community --help
+    - ansible-community --version
   imports:
     - ansible_collections
 
 about:
-  home: http://github.com/ansible/ansible
-  license: GPL-3.0-only
+  home: https://ansible.com/
+  license: GPL-3.0-or-later
   license_file: COPYING
   summary: Ansible is a radically simple IT automation platform
+  description: >
+    Ansible is a radically simple IT automation system. It makes applications
+    and systems easier to deploy by handling configuration management,
+    application deployment, cloud provisioning, ad-hoc task execution, network
+    automation, and multi-node orchestration.
 
-  description: |
-    Ansible is a radically simple IT automation platform
-    that makes your applications and systems easier to deploy.
-    Includes support for OpenStack (shade) and EC2 (AWS), extra
-    batteries included.
-  doc_url: https://www.ansible.com/
+    This package includes all collections from the (upstream) Ansible community
+    package.  It also installs dependencies for a core set of modules, mostly
+    filters from the `ansible.utils` and `community.general` collections.
+  doc_url: https://docs.ansible.com/ansible/latest/index.html
   dev_url: https://github.com/ansible/ansible
 
 extra:
@@ -57,3 +65,4 @@ extra:
     - brainstorm
     - tschoonj
     - pavelzw
+    - chenghlee
